@@ -6,8 +6,9 @@ import gift.entity.Product;
 import gift.entity.Wish;
 import gift.exception.notfound.ProductNotFoundException;
 import gift.exception.notfound.WishListNotFoundException;
-import gift.repository.product.ProductRepository;
-import gift.repository.wish.WishRepository;
+import gift.repository.product.ProductJpaRepository;
+import gift.repository.wish.WishJpaRepository;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,21 +17,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class WishServiceImpl implements WishService {
 
-  private WishRepository wishRepository;
+  private WishJpaRepository wishRepository;
 
-  private ProductRepository productRepository;
+  private ProductJpaRepository productRepository;
 
-  public WishServiceImpl(WishRepository wishRepository, ProductRepository productRepository) {
+  public WishServiceImpl(WishJpaRepository wishRepository, ProductJpaRepository productRepository) {
     this.wishRepository = wishRepository;
     this.productRepository = productRepository;
   }
 
-  @Override
   public List<WishResponseDto> findByMemberId(Long memberId) {
     List<Wish> allWish = wishRepository.findByMemberId(memberId);
     List<WishResponseDto> responseDtoList = new ArrayList<>();
     for (Wish wish : allWish) {
-      Optional<Product> productById = productRepository.findProductById(wish.getProductId());
+      Optional<Product> productById = productRepository.findById(wish.getProductId());
       Product product = productById.get();
       WishResponseDto responseDto = new WishResponseDto(wish.getId(), wish.getProductId(),
           product.getName(),
@@ -40,44 +40,42 @@ public class WishServiceImpl implements WishService {
     return responseDtoList;
   }
 
-  @Override
   public WishResponseDto createWish(Long memberId, WishRequestDto requestDto) {
-    Optional<Product> productById = productRepository.findProductById(requestDto.getProductId());
+    Optional<Product> productById = productRepository.findById(requestDto.getProductId());
     Product product = productById.orElseThrow(
         () -> new ProductNotFoundException("위시 리스트에 넣으려는 상품이 없습니다."));
 
-    Wish wish = wishRepository.createWish(
+    Wish wish = wishRepository.save(
         new Wish(memberId, requestDto.getProductId(),
             requestDto.getQuantity()));
     return new WishResponseDto(wish.getId(), wish.getProductId(), product.getName(),
         wish.getQuantity());
   }
 
-  @Override
+  @Transactional
   public WishResponseDto updateQuantity(Long memberId, WishRequestDto requestDto) {
-    Optional<Product> productById = productRepository.findProductById(requestDto.getProductId());
+    Optional<Product> productById = productRepository.findById(requestDto.getProductId());
     Product product = productById.orElseThrow(
         () -> new ProductNotFoundException("위시 리스트에 넣으려는 상품이 없습니다."));
 
-    wishRepository.updateQuantity(memberId,
-        new Wish(memberId, requestDto.getProductId(), requestDto.getQuantity()));
+    Wish wish = wishRepository.findByMemberIdAndProductId(memberId,
+        requestDto.getProductId()).orElseThrow(() -> new WishListNotFoundException("위시 리스트가 없습니다"));
+    wish.updateQuantity(requestDto.getQuantity());
 
-    Optional<Wish> OptionalWish = wishRepository.findByMemberIdAndProductId(memberId,
-        requestDto.getProductId());
-
-    Wish wish = OptionalWish.orElseThrow(
-        () -> new WishListNotFoundException("업데이트 하려는 위시 리스트가 없습니다."));
+//    Optional<Wish> OptionalWish = wishRepository.findByMemberIdAndProductId(memberId,
+//        requestDto.getProductId());
+//
+//    Wish wish = OptionalWish.orElseThrow(
+//        () -> new WishListNotFoundException("업데이트 하려는 위시 리스트가 없습니다."));
     return new WishResponseDto(wish.getId(), wish.getProductId(),
         product.getName(), wish.getQuantity());
   }
 
-  @Override
   public void deleteAllWish(Long memberId) {
-    wishRepository.deleteAllWish(memberId);
+    wishRepository.deleteByMemberId(memberId);
   }
-
-  @Override
+  
   public void deleteByProductId(Long memberId, Long productId) {
-    wishRepository.deleteByProductId(memberId, productId);
+    wishRepository.deleteByMemberIdAndProductId(memberId, productId);
   }
 }
