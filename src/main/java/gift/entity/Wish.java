@@ -1,10 +1,11 @@
 package gift.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Wish {
@@ -13,11 +14,13 @@ public class Wish {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false, name = "member_id")
-  private Long memberId;
+  @ManyToOne
+  @JoinColumn(name = "MEMBER_ID")
+  private Member member;
 
-  @Column(nullable = false, name = "product_id")
-  private Long productId;
+  @ManyToOne
+  @JoinColumn(name = "PRODUCT_ID")
+  private Product product;
 
   private Long quantity;
 
@@ -25,35 +28,35 @@ public class Wish {
 
   }
 
-  public Wish(Long id, Long memberId, Long productId, Long count) {
+  public Wish(Long id, Member member, Product product, Long quantity) {
     this.id = id;
-    this.memberId = memberId;
-    this.productId = productId;
-    this.quantity = count;
+    this.member = member;
+    this.product = product;
+    this.quantity = quantity;
   }
 
-  public Wish(Long memberId, Long productId, Long count) {
-    this(null, memberId, productId, count);
+  public Wish(Member member, Product product, Long quantity) {
+    this(null, member, product, quantity);
   }
 
   public Long getId() {
     return id;
   }
 
-  public Long getMemberId() {
-    return memberId;
+  public void setId(Long id) {
+    this.id = id;
   }
 
-  public Long getProductId() {
-    return productId;
+  public Product getProduct() {
+    return product;
+  }
+
+  public Member getMember() {
+    return member;
   }
 
   public Long getQuantity() {
     return quantity;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
   }
 
   public void updateQuantity(Long quantity) {
