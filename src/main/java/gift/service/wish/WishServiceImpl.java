@@ -1,5 +1,6 @@
 package gift.service.wish;
 
+import gift.dto.product.ProductResponseDto;
 import gift.dto.wish.WishRequestDto;
 import gift.dto.wish.WishResponseDto;
 import gift.entity.Member;
@@ -39,13 +40,15 @@ public class WishServiceImpl implements WishService {
     for (Wish wish : allWish) {
       Optional<Product> productById = productRepository.findById(wish.getProduct().getId());
       Product product = productById.get();
-      WishResponseDto responseDto = new WishResponseDto(wish.getId(), wish.getProduct(),
+      WishResponseDto responseDto = new WishResponseDto(wish.getId(),
+          new ProductResponseDto(wish.getProduct()),
           wish.getQuantity());
       responseDtoList.add(responseDto);
     }
     return responseDtoList;
   }
 
+  @Transactional
   public WishResponseDto createWish(Long memberId, WishRequestDto requestDto) {
     Member member = memberJpaRepository.findById(memberId)
         .orElseThrow(() -> new MemberNotFoundException("멤버가 없습니다"));
@@ -53,7 +56,8 @@ public class WishServiceImpl implements WishService {
         .orElseThrow(() -> new ProductNotFoundException("위시 리스트에 넣으려는 상품이 없습니다."));
 
     Wish wish = wishRepository.save(new Wish(member, product, requestDto.getQuantity()));
-    return new WishResponseDto(wish.getId(), wish.getProduct(), wish.getQuantity());
+    return new WishResponseDto(wish.getId(), new ProductResponseDto(wish.getProduct()),
+        wish.getQuantity());
   }
 
   @Transactional
@@ -66,13 +70,16 @@ public class WishServiceImpl implements WishService {
         requestDto.getProductId()).orElseThrow(() -> new WishListNotFoundException("위시 리스트가 없습니다"));
     wish.updateQuantity(requestDto.getQuantity());
 
-    return new WishResponseDto(wish.getId(), wish.getProduct(), wish.getQuantity());
+    return new WishResponseDto(wish.getId(), new ProductResponseDto(wish.getProduct()),
+        wish.getQuantity());
   }
 
+  @Transactional
   public void deleteAllWish(Long memberId) {
     wishRepository.deleteByMemberId(memberId);
   }
 
+  @Transactional
   public void deleteByProductId(Long memberId, Long productId) {
     wishRepository.deleteByMemberIdAndProductId(memberId, productId);
   }
