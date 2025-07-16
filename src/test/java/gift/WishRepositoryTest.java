@@ -82,7 +82,6 @@ public class WishRepositoryTest {
 
     boolean present = wishRepository.findById(actual.getId()).isPresent();
     assertThat(present).isFalse();
-    
   }
 
 }
