@@ -36,6 +36,7 @@ public class ProductServiceImpl implements ProductService {
         .orElseThrow(() -> new ProductNotFoundException("product가 없습니다."));
   }
 
+  @Transactional
   public ProductResponseDto createProduct(ProductRequestDto requestDto) {
     Product checkProduct = new Product(requestDto.getName(), requestDto.getPrice(),
         requestDto.getImageUrl());
@@ -60,6 +61,7 @@ public class ProductServiceImpl implements ProductService {
         product.getImageUrl());
   }
 
+  @Transactional
   public void deleteProduct(Long id) {
     repository.deleteById(id);
   }

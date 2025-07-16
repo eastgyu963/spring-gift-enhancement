@@ -17,7 +17,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
-@Transactional
 public class MemberServiceImpl implements MemberService {
 
   private final MemberJpaRepository repository;
@@ -28,6 +27,7 @@ public class MemberServiceImpl implements MemberService {
     this.jwtProvider = jwtProvider;
   }
 
+  @Transactional
   public Token register(MemberRequestDto requestDto) {
     if (repository.findByEmail(requestDto.getEmail()).isPresent()) {
       throw new AlreadyRegisterException("이미 가입된 이메일입니다");
@@ -66,6 +66,7 @@ public class MemberServiceImpl implements MemberService {
         .orElseThrow(() -> new MemberNotFoundException("member가 없습니다"));
   }
 
+  @Transactional
   public MemberResponseDto createMember(MemberRequestDto requestDto) {
     Member member = repository.save(
         new Member(requestDto.getEmail(), requestDto.getPassword()));
