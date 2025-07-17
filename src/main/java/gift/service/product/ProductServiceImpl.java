@@ -9,6 +9,8 @@ import gift.repository.product.ProductJpaRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,6 +30,11 @@ public class ProductServiceImpl implements ProductService {
       responseDtoList.add(responseDto);
     }
     return responseDtoList;
+  }
+
+  @Override
+  public Page<ProductResponseDto> findAllProductAsPage(Pageable pageable) {
+    return repository.findAll(pageable).map(ProductResponseDto::new);
   }
 
   public ProductResponseDto findProductById(Long id) {
