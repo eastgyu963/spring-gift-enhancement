@@ -16,6 +16,8 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,6 +48,11 @@ public class WishServiceImpl implements WishService {
       responseDtoList.add(responseDto);
     }
     return responseDtoList;
+  }
+
+  @Override
+  public Page<WishResponseDto> findByMemberIdAsPage(Long memberId, Pageable pageable) {
+    return wishRepository.findByMemberId(memberId, pageable).map(WishResponseDto::new);
   }
 
   @Transactional
