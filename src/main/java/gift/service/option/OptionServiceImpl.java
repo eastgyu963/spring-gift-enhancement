@@ -4,6 +4,7 @@ import gift.dto.option.OptionRequestDto;
 import gift.dto.option.OptionResponseDto;
 import gift.entity.Option;
 import gift.entity.Product;
+import gift.exception.DuplicatedOptionException;
 import gift.exception.notfound.ProductNotFoundException;
 import gift.repository.option.OptionJpaRepository;
 import gift.repository.product.ProductJpaRepository;
@@ -39,7 +40,7 @@ public class OptionServiceImpl implements OptionService {
     List<Option> options = product.getOptions();
     for (Option option : options) {
       if (requestDto.getName().equals(option.getName())) {
-        throw new IllegalStateException("중복된 옵션이 존재합니다.");
+        throw new DuplicatedOptionException("중복된 옵션이 존재합니다.");
       }
     }
 

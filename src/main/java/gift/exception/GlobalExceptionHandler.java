@@ -63,4 +63,12 @@ public class GlobalExceptionHandler {
         exception.getMessage());
     return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
   }
+
+  @ExceptionHandler(value = DuplicatedOptionException.class)
+  public ResponseEntity<CustomErrorResponse> handleDuplicateOptionException(
+      DuplicatedOptionException exception) {
+    CustomErrorResponse errorResponse = new CustomErrorResponse(HttpStatus.CONFLICT,
+        exception.getMessage());
+    return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+  }
 }
