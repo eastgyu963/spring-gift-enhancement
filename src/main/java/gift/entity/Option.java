@@ -51,7 +51,7 @@ public class Option {
     return product;
   }
 
-  public void setProduct(Product product) {
+  protected void setProduct(Product product) {
     this.product = product;
   }
 
