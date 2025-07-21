@@ -59,7 +59,7 @@ public class ProductController {
   @PostMapping("/{id}/options")
   public ResponseEntity<OptionResponseDto> createOption(@PathVariable Long id,
       @Valid @RequestBody OptionRequestDto requestDto) {
-    return new ResponseEntity<>(optionService.createOption(id, requestDto), HttpStatus.OK);
+    return new ResponseEntity<>(optionService.createOption(id, requestDto), HttpStatus.CREATED);
   }
 
   @PatchMapping("/{id}")
