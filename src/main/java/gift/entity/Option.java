@@ -1,5 +1,6 @@
 package gift.entity;
 
+import gift.exception.CantSubtractException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -56,6 +57,9 @@ public class Option {
   }
 
   public int subtractQuantity(int quantity) {
+    if (this.quantity < quantity) {
+      throw new CantSubtractException("옵션 수량보다 더 큰 수량은 불가능합니다.");
+    }
     return this.quantity -= quantity;
   }
 }
